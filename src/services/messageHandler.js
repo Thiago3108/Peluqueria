@@ -13,6 +13,10 @@ class MessageHandler {
         await whatsappService.sendMessage(message.from, response, message.id);
       }
       await whatsappService.markAsRead(message.id);
+    } else if (message?.type === 'interactive') {
+      const option = message?.interactive?.button_reply?.title.toLowerCase().trim();
+      await this.handleMenuOption(message.from, option);
+      await whatsappService.markAsRead(message.id);
     }
   }
 
@@ -45,6 +49,36 @@ class MessageHandler {
     ];
 
     await whatsappService.sendInteractiveButtons(to, menuMessage, buttons);
+  }
+
+  async handleMenuOption(to, option) {
+    let response;
+    switch (option) {
+      case 'agendar':
+        response = '¡Claro!, puedes agendar tu cita en el siguiente enlace: https://forms.gle/w6iZ733bdU2MXjUK8';
+        break;
+      case 'ubicación':
+        await this.sendLocation(to);
+        break;
+      case 'otra cosa':
+        response = '¡Claro!, ¿En qué más puedo ayudarte?';
+        break;
+      default:
+        response = 'Lo siento, no entendí tu mensaje. Por favor intenta de nuevo.';
+        break;
+    }
+    await whatsappService.sendMessage(to, response);
+  }
+
+  async sendLocation(to) {
+    const location = {
+      latitude: '7.068851947784424', // Latitud de la peluquería
+      longitude: '-73.10446166992188', // Longitud de la peluquería
+      name: `7°04'07.9"N 73°06'16.1"W`,
+      address: `261 Cl. 33`
+    };
+  
+    await whatsappService.sendLocation(to, location);
   }
 
 }

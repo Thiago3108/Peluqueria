@@ -14,9 +14,9 @@ class WhatsAppService {
           messaging_product: 'whatsapp',
           to,
           text: { body },
-          context: {
-            message_id: messageId,
-          },
+        //  context: {
+        //    message_id: messageId,
+        //  },
         },
       });
     } catch (error) {
@@ -68,6 +68,32 @@ class WhatsAppService {
       console.error('Error sending interactive buttons:', error);
     }
   }
+
+  async sendLocation(to, location) {
+    try {
+      await axios({
+        method: 'POST',
+        url: `https://graph.facebook.com/${config.API_VERSION}/${config.BUSINESS_PHONE}/messages`,
+        headers: {
+          Authorization: `Bearer ${config.API_TOKEN}`,
+        },
+        data: {
+          messaging_product: 'whatsapp',
+          to,
+          type: 'location',
+          location: {
+            latitude: location.latitude,
+            longitude: location.longitude,
+            name: location.name,
+            address: location.address,
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Error sending location:', error);
+    }
+  }
+
 }
 
 export default new WhatsAppService();
