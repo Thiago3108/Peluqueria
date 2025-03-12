@@ -6,12 +6,12 @@ class MessageHandler {
       const incomingMessage = message.text.body.toLowerCase().trim();
       
       if (this.isGreeting(incomingMessage)) {
-        await this.sendWelcomeMessage(message.from, message.id, senderInfo);
+  //      await this.sendWelcomeMessage(message.from, message.id, senderInfo);
         await this.sendWelcomeMenu(message.from);
-      }else{
-        const response = `Echo: ${message.text.body}`;
-        await whatsappService.sendMessage(message.from, response, message.id);
-      }
+      }//else{
+        //const response = `Echo: ${message.text.body}`;
+        //await whatsappService.sendMessage(message.from, response, message.id);
+      //}
       await whatsappService.markAsRead(message.id);
     } else if (message?.type === 'interactive') {
       const option = message?.interactive?.button_reply?.title.toLowerCase().trim();
@@ -21,21 +21,23 @@ class MessageHandler {
   }
 
   isGreeting(message) {
-    const greetings = ['hi', 'hello','que mas', 'que tal', 'oiga mk','buenas tardes','mk', 'buenos dias', 'hey', 'hola', 'ola', 'hallo', 'bonjour', 'ciao', 'namaste', 'salaam', 'konnichiwa', 'ni hao', 'privet', 'shalom', 'merhaba'];
-    return greetings.includes(message);
+    const greetings = ['agendar', 'ubicación', 'cita','agendar cita', 'ubicacion'];
+    return greetings.some(greetings => message.includes(greetings));
   }
 
   getSenderName(senderInfo) {
     return senderInfo.profile?.name || senderInfo.wa_id || '';
   }
 
-  async sendWelcomeMessage(to, messageId, senderInfo) {
-    const name = this.getSenderName(senderInfo).match(/(\w+)/)?.[1] || "Parce";
-    const welcomeMessage = `¡Hola ${name}!, Bienvenido a nuestro servicio de atención al cliente!. ¿En qué puedo ayudarte?`;
-    await whatsappService.sendMessage(to, welcomeMessage, messageId);
-  }
+//  async sendWelcomeMessage(to, messageId, senderInfo) {
+//    const name = this.getSenderName(senderInfo).match(/(\w+)/)?.[1] || "Parce";
+//    const welcomeMessage = `¡Hola ${name}!, Bienvenido a nuestro servicio de atención al cliente!. ¿En qué puedo ayudarte?`;
+//    await whatsappService.sendMessage(to, welcomeMessage, messageId);
+//  }
   async sendWelcomeMenu(to){
-    const menuMessage = `Por favor, selecciona una de las siguientes opciones:`
+    const menuMessage = `¡Bienvenido/a a [Nombre de la Peluquería]! 💈✂️
+
+Elige la opción que necesitas:`
     const buttons = [
       {
         type: 'reply', reply: { id: 'option_1', title: 'Agendar' }
@@ -55,7 +57,13 @@ class MessageHandler {
     let response;
     switch (option) {
       case 'agendar':
-        response = '¡Claro!, puedes agendar tu cita en el siguiente enlace: https://forms.gle/w6iZ733bdU2MXjUK8';
+        response = `¡Genial! Ya casi terminamos. ✂️💈
+        
+Para agendar tu cita, solo debes acceder al siguiente enlace y seleccionar la fecha y hora que más te convenga 
+        
+  🔗 https://forms.gle/w6iZ733bdU2MXjUK8
+        
+Una vez lo completes, te enviaremos la confirmación. Si tienes alguna duda, escríbenos y te ayudamos. 😉 `;
         break;
       case 'ubicación':
         await this.sendLocation(to);
